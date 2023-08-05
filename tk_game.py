@@ -38,17 +38,22 @@ class GAME_WINDOW:
 
         self.can = tk.Canvas(self.window)
         self.can.pack(anchor='nw', fill='both', expand=1)
+        self.can.create_image(0, 0, image=self.bg_image, anchor='nw')
 
         self.draw_names()
         self.draw_hexagons()
 
 
     def load_images(self):
+        #background
+        self.bg_image = Image.open("pics/background.png")
+        self.bg_image = self.bg_image.resize( (self.width,self.height) )
+        self.bg_image = ImageTk.PhotoImage(self.bg_image)
+
         #white hexagon
         self.hexagon_image_white = Image.open("pics/hexagon.png")
         self.hexagon_image_white = self.hexagon_image_white.resize((self.hex_width,self.hex_height))
         self.hexagon_image_white = ImageTk.PhotoImage(self.hexagon_image_white)
-        lbl1 = tk.Label(None,image = self.hexagon_image_white)
 
         #black hexagon
         self.hexagon_image_black = Image.open("pics/hexagon_black.png")
@@ -75,8 +80,10 @@ class GAME_WINDOW:
 
     def draw_names(self):
         #print("self.game.player1 value is ", self.game.player1)
-        self.can.create_text(150, self.height-100, fill="blue",font="Times 20 bold", text=self.game.player1)
-        self.can.create_text(self.width-150, self.height-100, fill="orange",font="Times 20 bold", text=self.game.player2)
+        self.can.create_rectangle(50,self.height-100,250,self.height-10,outline ="blue",fill ="white",width = 2)
+        self.can.create_text(150, self.height-50, fill="blue",font="Times 20 bold", text=self.game.player1)
+        self.can.create_rectangle(self.width-250,self.height-100,self.width-50,self.height-10,outline ="orange",fill ="white",width = 2)
+        self.can.create_text(self.width-150, self.height-50, fill="orange",font="Times 20 bold", text=self.game.player2)
 
     def draw_hexagons(self):
         self.spots = []
@@ -93,8 +100,9 @@ class GAME_WINDOW:
                 h_text_x = hex_x+self.hex_width/2
                 h_text_y = hex_y+self.hex_height/2
 
-                spot_text = self.can.create_text(h_text_x, h_text_y, fill="black",font="Times 20 bold", text=str(h.idx))
+
                 spot = self.draw_hexagon(idx, hex_x, hex_y)
+                spot_text = self.can.create_text(h_text_x, h_text_y, fill="black",font="Times 20 bold", text=str(h.idx))
                 
                 #spot = self.can.create_image(hex_x, hex_y, image=self.hexagon_image_white, anchor='nw')
                 #spot = self.can.create_image(0, 0, image=self.hexagon_image_white)
@@ -130,17 +138,21 @@ class GAME_WINDOW:
     def clear(self):
         for widget in self.window.winfo_children():
             widget.destroy()
+        print("kreslim bg")
+        self.can.create_image(0, 0, image=self.bg_image, anchor='nw')
 
     def exit(self):
         self.window.destroy()
     
     def redraw(self):
         self.can.delete('all')
+        self.can.create_image(0, 0, image=self.bg_image, anchor='nw')
         self.draw_hexagons()
         self.draw_names()
 
     def show_question(self, abbreviation):
         self.can.delete('all')
+        self.can.create_image(0, 0, image=self.bg_image, anchor='nw')
         self.draw_names()
         self.show_timer(10, abbreviation)
 
@@ -164,8 +176,8 @@ class GAME_WINDOW:
     def show_timer(self, seconds, text):
         text_y = self.height/2
         text_x = self.width/2
-        timer_text = self.can.create_text(text_x, text_y, fill="black",font="Times 70 bold", text=text)
         timer_hex = self.can.create_image(200, 50, image=self.hexagon_question_white, anchor='nw')
+        timer_text = self.can.create_text(text_x, text_y, fill="black",font="Times 70 bold", text=text)
 
         self.can.create_oval(self.width//4, self.height//5, 3*self.width//4, 3*self.height//4,width=3)
         self.can.create_oval(self.width//4-10, self.height//5-10, 3*self.width//4+10, 3*self.height//4+10, width=3)
