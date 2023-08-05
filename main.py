@@ -45,7 +45,7 @@ class GAME:
                     self.hexagons[idx-1].neighbors.append(idx)
                 if col == row-1:
                     h.right_wall = True
-                if row == rows-1:
+                if row == rows:
                     h.bottom_wall = True
                 # vertical neighbors:
                 if row != 0: 
@@ -75,14 +75,14 @@ class GAME:
         self.admin_window.clear()
 
     def exit(self):
-        self.admin_window.destroy()
-        self.game_window.destroy()
+        self.admin_window.exit()
+        self.game_window.exit()
         exit(0)
 
     def hexagon_clicked(self, idx):
         print("clicked hexagon: ", idx)
-        if self.hexagons[idx].state == "white":
-            self.ask_question(idx, self.questions[0]) #TODO select question
+        if self.hexagons[idx].state == "white" or self.hexagons[idx].state == "black":
+            self.ask_question(idx, self.questions[0]) 
 
     def set_question_outcome(self, outcome):
         self.question_outcome = outcome
@@ -97,6 +97,9 @@ class GAME:
         self.hexagon_idx_opened = idx
         self.admin_window.show_question(question.question, question.answer)
         self.game_window.show_question(question.abbreviation)
+
+    def start_timer(self):
+        self.game_window.start_timer()
 
     def bfs(self, player, bfs_list):
         print("dostavam bfs s ", bfs_list)
@@ -130,13 +133,14 @@ class GAME:
                 if new_node.state == player:
                     Q.put(new_node)
 
-            if len(bfs_list) == 0:
-                print("vracim false")
-                return False
-            
             if sum(state) == 3:
                 print("vracim true")
                 return True
+
+            if len(bfs_list) == 0:
+                print("vracim false")
+                return False
+        
 
 
     def check_finnish(self):
@@ -153,12 +157,11 @@ class GAME:
             if orange_status:
                 self.orange_wins()
         
-        
     def blue_wins(self):
-        self.game_window.clear()
+        self.game_window.blue_wins()
 
     def orange_wins(self):
-        self.game_window.clear()
+        self.game_window.orange_wins()
         
     
 game = GAME("Hráč 1", "Hráč 2")

@@ -1,6 +1,7 @@
 import tkinter as tk
 import time
 from playsound import playsound
+from threading import Thread
 
 
 
@@ -129,6 +130,9 @@ class GAME_WINDOW:
     def clear(self):
         for widget in self.window.winfo_children():
             widget.destroy()
+
+    def exit(self):
+        self.window.destroy()
     
     def redraw(self):
         self.can.delete('all')
@@ -138,14 +142,24 @@ class GAME_WINDOW:
     def show_question(self, abbreviation):
         self.can.delete('all')
         self.draw_names()
-        self.show_timer(15, abbreviation)
+        self.show_timer(10, abbreviation)
 
     def update_timer(self):
         if self.game.question_outcome is not None:
+            self.tenths_left = 0
             return
         degrees = int( 360 * (1- (self.tenths_left/self.tenths_total) ) )
         self.tenths_left -= 1
         self.can.create_arc(self.width//4-5, self.height//5-5, 3*self.width//4+5, 3*self.height//4+5, start=0, extent=degrees, outline="white", width=10, style="arc")
+        if self.tenths_left % 10 == 0:
+            thread = Thread(target=lambda: playsound('sounds/tick.mp3') )
+            thread.start()
+
+    def start_timer(self):
+        if self.tenths_left < self.tenths_total:
+            return
+        for i in range(self.tenths_total+1):
+            self.window.after(100 * i, self.update_timer)
 
     def show_timer(self, seconds, text):
         text_y = self.height/2
@@ -162,9 +176,19 @@ class GAME_WINDOW:
         self.tenths_total = 10*seconds
         self.tenths_left = self.tenths_total
 
-        for i in range(self.tenths_total):
-            self.window.after(100 * i, self.update_timer)
+    def blue_wins(self):
+        self.clear()
+        empty_label = tk.Label(self.window, text=" ", font="Times 25 bold")
+        final_label = tk.Label(self.window, text="MODREJ VÍTĚZÍ", font="Times 40 bold", fg="BLUE")
+        empty_label.pack()
+        final_label.pack()
 
+    def orange_wins(self):
+        self.clear()
+        empty_label = tk.Label(self.window, text=" ", font="Times 25 bold")
+        final_label = tk.Label(self.window, text="ORANŽOVEJ VÍTĚZÍ", font="Times 40 bold", fg="ORANGE")
+        empty_label.pack()
+        final_label.pack()
 
     def show(self):
         self.window.mainloop()
